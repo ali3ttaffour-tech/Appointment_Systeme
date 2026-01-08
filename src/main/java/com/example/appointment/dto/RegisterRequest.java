@@ -1,0 +1,12 @@
+package com.example.appointment.dto;
+
+import com.example.appointment.entity.Role;
+import lombok.Data;
+
+@Data
+public class RegisterRequest {
+    private String username;
+    private String password;
+    private String email;
+    private Role role;
+}
