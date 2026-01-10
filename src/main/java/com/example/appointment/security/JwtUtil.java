@@ -22,7 +22,7 @@ public class JwtUtil {
     }
 
     // 1️⃣ توليد التوكن
-    public String generateToken(Long userId, String username, String role) {
+    public String generateToken(String userId, String username, String role) {
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);

@@ -12,8 +12,8 @@ import java.util.UUID;
 public class Appointment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+
+    private String id;
 
 
 
@@ -30,5 +30,14 @@ public class Appointment {
 
     @Enumerated(EnumType.STRING)
     private AppointmentStatus status;
+
+
+
+
+
+    @PrePersist
+    public void generateId() {
+        this.id = UUID.randomUUID().toString();
+    }
 
 }

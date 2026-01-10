@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "users")
 @Getter
@@ -13,8 +15,8 @@ import lombok.Setter;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+
+    private String id;
 
     @Column(unique = true, nullable = false)
     private String username;
@@ -28,4 +30,10 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+
+    @PrePersist
+    public void generateId() {
+        this.id = UUID.randomUUID().toString();
+    }
 }
