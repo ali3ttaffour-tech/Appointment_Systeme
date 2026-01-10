@@ -20,6 +20,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     public String register(RegisterRequest request) {
 
@@ -45,7 +46,16 @@ public class AuthService {
 
         userRepository.save(user);
 
+
+
+        emailService.sendMail(
+                user.getEmail(),
+                "Welcome to Appointment System",
+                "Your account has been created successfully!"
+        );
+
         return "User registered successfully";
+
     }
 
     // LOGIN

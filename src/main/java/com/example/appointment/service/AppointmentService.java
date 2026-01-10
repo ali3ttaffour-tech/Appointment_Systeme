@@ -20,6 +20,9 @@ import java.util.List;
 @Service
 public class AppointmentService {
 
+    @Autowired
+    private EmailService emailService;
+
 
     @Autowired
     private UserRepository userRepository;
@@ -78,6 +81,15 @@ public class AppointmentService {
         appointment.setStartTime(startTime);
         appointment.setEndTime(endTime);
         appointment.setStatus(AppointmentStatus.PENDING);
+
+
+        emailService.sendMail(
+                user.getEmail(),
+                "Appointment Confirmed",
+                "Your appointment for service " + service.getName() +
+                        " has been booked at " + startTime
+        );
+
 
         return appointmentRepository.save(appointment);
     }
