@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -36,22 +37,60 @@ public class AppointmentService {
     @Autowired
     private WorkingScheduleRepository workingScheduleRepository;
 
+    private boolean isValidSlot(LocalDateTime startTime, LocalTime workStart, LocalTime workEnd, int duration) {
+
+        // نحدد أول فتحة زمنية في اليوم
+        LocalDateTime slot = startTime.withHour(workStart.getHour())
+                .withMinute(workStart.getMinute())
+                .withSecond(0)
+                .withNano(0);
+
+        // نهاية الدوام
+        LocalDateTime endOfDay = startTime.withHour(workEnd.getHour())
+                .withMinute(workEnd.getMinute())
+                .withSecond(0)
+                .withNano(0);
+
+        // نولّد كل الفترات الممكنة ونقارن مع وقت الحجز
+        while (!slot.isAfter(endOfDay)) {
+
+            if (slot.equals(startTime)) {
+                return true;   // وقت الحجز صحيح
+            }
+
+            slot = slot.plusMinutes(duration);  // نولّد الفتحة التالية
+        }
+
+        return false;  // وقت غير صحيح
+    }
+
+
+
+
+
+
+
+
+
+
+
     @Transactional
     public Appointment createAppointment(String serviceId, LocalDateTime startTime) {
 
-        // 1) جيب اسم المستخدم من التوكن
+        // 1) جلب الاسم من التوكن
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // 2) جلب الخدمة
+        // 2) الخدمة
         ServiceEntity service = serviceRepository.findById(serviceId)
                 .orElseThrow(() -> new RuntimeException("Service not found"));
 
-        LocalDateTime endTime = startTime.plusMinutes(service.getDurationMinutes());
+        int duration = service.getDurationMinutes();
+        LocalDateTime endTime = startTime.plusMinutes(duration);
 
-        // 3) Working hours
+        // 3) دوام اليوم
         WorkingSchedule schedule = workingScheduleRepository
                 .findByDayOfWeek(startTime.getDayOfWeek().getValue())
                 .orElseThrow(() -> new RuntimeException("No working schedule"));
@@ -60,12 +99,21 @@ public class AppointmentService {
             throw new RuntimeException("Holiday");
         }
 
-        if (startTime.toLocalTime().isBefore(schedule.getStartTime())
-                || endTime.toLocalTime().isAfter(schedule.getEndTime())) {
-            throw new RuntimeException("Outside working hours");
-        }
+        // ————————————————————————
+        // 🟢 4) التحقق من أن الفتحة الزمنية صحيحة
+        boolean validSlot = isValidSlot(
+                startTime,
+                schedule.getStartTime(),
+                schedule.getEndTime(),
+                duration
+        );
 
-        // 4) Conflict check
+        if (!validSlot) {
+            throw new RuntimeException("Invalid time slot for this service duration");
+        }
+        // ————————————————————————
+
+        // 5) التحقق من التداخل
         boolean conflict = !appointmentRepository
                 .findOverlappingAppointmentsForService(serviceId, startTime, endTime)
                 .isEmpty();
@@ -74,13 +122,17 @@ public class AppointmentService {
             throw new RuntimeException("Service already booked at this time");
         }
 
-        // 5) إنشاء الموعد
+        // 6) إنشاء الموعد
         Appointment appointment = new Appointment();
         appointment.setCustomer(user);
         appointment.setService(service);
         appointment.setStartTime(startTime);
         appointment.setEndTime(endTime);
         appointment.setStatus(AppointmentStatus.PENDING);
+
+
+
+
 
 
         emailService.sendMail(
@@ -90,9 +142,11 @@ public class AppointmentService {
                         " has been booked at " + startTime
         );
 
-
         return appointmentRepository.save(appointment);
     }
+
+
+
 
 
 
