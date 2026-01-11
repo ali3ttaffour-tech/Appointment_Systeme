@@ -26,7 +26,7 @@ public class ServiceController {
     @Operation(summary = "Update new service", description = "Only admin can Update new service")
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ServiceEntity update(@PathVariable Long id, @RequestBody ServiceEntity service) {
+    public ServiceEntity update(@PathVariable String id, @RequestBody ServiceEntity service) {
         ServiceEntity existing = serviceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Service not found"));
 
@@ -42,7 +42,7 @@ public class ServiceController {
     @Operation(summary = "Delete new service", description = "Only admin can delete new service")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public void delete(@PathVariable Long id) {
+    public void delete(@PathVariable String id) {
         serviceRepository.deleteById(id);
     }
 

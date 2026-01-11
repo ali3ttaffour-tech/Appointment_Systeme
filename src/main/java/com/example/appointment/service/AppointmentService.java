@@ -37,7 +37,7 @@ public class AppointmentService {
     private WorkingScheduleRepository workingScheduleRepository;
 
     @Transactional
-    public Appointment createAppointment(Long serviceId, LocalDateTime startTime) {
+    public Appointment createAppointment(String serviceId, LocalDateTime startTime) {
 
         // 1) جيب اسم المستخدم من التوكن
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -100,7 +100,7 @@ public class AppointmentService {
 
 
 
-    public Appointment updateStatus(Long id, AppointmentStatus status) {
+    public Appointment updateStatus(String id, AppointmentStatus status) {
 
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));

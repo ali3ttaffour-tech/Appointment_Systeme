@@ -43,7 +43,7 @@ public class AppointmentController {
     @PatchMapping("/{id}/status")
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
     public ResponseEntity<?> updateStatus(
-            @PathVariable Long id,
+            @PathVariable String id,
             @RequestParam AppointmentStatus status
     ) {
         try {
