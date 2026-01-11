@@ -20,4 +20,7 @@ AND a.status != 'CANCELLED'
             LocalDateTime endTime
     );
 
+    List<Appointment> findByStartTimeBetween(LocalDateTime start, LocalDateTime end);
+
+
 }
