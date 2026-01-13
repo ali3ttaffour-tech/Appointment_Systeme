@@ -20,6 +20,8 @@ public class AuthService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
+    private final EmailService emailService1;
 
     public String register(RegisterRequest request) {
 
@@ -45,7 +47,16 @@ public class AuthService {
 
         userRepository.save(user);
 
+
+
+        emailService.sendMail(
+                user.getEmail(),
+                "Welcome to Appointment System",
+                "Your account has been created successfully!"
+        );
+
         return "User registered successfully";
+
     }
 
     // LOGIN
@@ -63,6 +74,17 @@ public class AuthService {
                 user.getUsername(),
                 user.getRole().name()   // ✔ يحول Enum إلى String
         );
+
+
+
+        emailService1.sendMail(
+                user.getEmail(),
+                "Welcome to Appointment System",
+                "Your account has login successfully!"
+        );
+
+
+
 
         return new AuthResponse(token);
     }

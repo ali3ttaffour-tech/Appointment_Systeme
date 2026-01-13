@@ -4,7 +4,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 @Data
 public class AppointmentRequest {
-    private Long serviceId;
+    private String serviceId;
     private Long userId;
     private LocalDateTime startTime;
 }
