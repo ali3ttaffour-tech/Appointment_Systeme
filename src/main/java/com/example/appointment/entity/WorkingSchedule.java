@@ -12,7 +12,7 @@ public class WorkingSchedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Integer dayOfWeek; // 1 (Monday) to 7 (Sunday)
+    private Integer dayOfWeek;
     private LocalTime startTime;
     private LocalTime endTime;
     private boolean isHoliday;

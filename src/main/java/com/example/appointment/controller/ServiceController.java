@@ -15,11 +15,9 @@ public class ServiceController {
 
     @Autowired
     private ServiceRepository serviceRepository;
-<<<<<<< HEAD
-    @Operation(summary = "Create new service", description = "Only admin can add new service11")
-=======
+
+
     @Operation(summary = "Create new service", description = "Only admin can add new service1")
->>>>>>> main1
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ServiceEntity create(@RequestBody ServiceEntity service) {

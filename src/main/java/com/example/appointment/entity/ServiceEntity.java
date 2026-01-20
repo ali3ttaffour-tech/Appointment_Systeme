@@ -9,8 +9,8 @@ import java.util.UUID;
 @Table(name = "services")
 @Data
 public class ServiceEntity {
-    @Id
 
+    @Id
     private String id;
 
     private String name;

@@ -12,10 +12,7 @@ import java.util.UUID;
 public class Appointment {
 
     @Id
-
     private String id;
-
-
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
