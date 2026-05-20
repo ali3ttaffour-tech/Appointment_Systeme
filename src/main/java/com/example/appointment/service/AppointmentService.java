@@ -22,6 +22,11 @@ import java.util.List;
 public class AppointmentService {
 
     @Autowired
+    private NotificationService notificationService;
+
+
+
+    @Autowired
     private EmailService emailService;
 
 
@@ -160,6 +165,11 @@ public class AppointmentService {
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
 
         appointment.setStatus(status);
+
+        notificationService.sendToUser(
+                appointment.getCustomer().getUsername(),
+                "Your appointment status changed to " + status
+        );
         return appointmentRepository.save(appointment);
     }
 
