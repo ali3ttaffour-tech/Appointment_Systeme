@@ -1,8 +1,8 @@
-package com.example.appointment.enums;
+    package com.example.appointment.enums;
 
-public enum AppointmentStatus {
-    PENDING,
-    ACCEPTED,
-    CANCELLED,
-    FINISHED
-}
+    public enum AppointmentStatus {
+        PENDING,
+        ACCEPTED,
+        CANCELLED,
+        FINISHED
+    }
