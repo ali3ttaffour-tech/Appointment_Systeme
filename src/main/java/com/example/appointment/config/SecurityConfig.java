@@ -50,7 +50,7 @@ public class SecurityConfig {
 
 
 
-                        .requestMatchers("/api/admin/users/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/users", "/api/admin/users/**").hasRole("ADMIN")
 
                         .requestMatchers("/api/services/**").hasAnyRole("ADMIN", "STAFF", "CUSTOMER")
                         .requestMatchers(HttpMethod.POST, "/api/services/**").hasRole("ADMIN")
