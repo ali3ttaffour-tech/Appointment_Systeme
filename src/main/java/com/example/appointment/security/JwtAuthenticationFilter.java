@@ -14,7 +14,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -29,15 +28,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
-        // ⛔ تخطي الفلتر لمسارات لا تحتاج JWT
         String path = request.getRequestURI();
-        if (path.startsWith("/api/auth") || path.startsWith("/h2-console")) {
+
+        // ⛔ Skip auth endpoints
+        if (path.startsWith("/api/auth") || path.startsWith("/h2-console") || path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        final String authHeader = request.getHeader("Authorization");
+        String authHeader = request.getHeader("Authorization");
 
+        System.out.println("➡ REQUEST: " + path);
+        System.out.println("➡ AUTH HEADER: " + authHeader);
+
+        // ❌ No token → continue as anonymous
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -49,6 +53,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             username = jwtUtil.extractUsername(jwt);
         } catch (Exception e) {
+            System.out.println("❌ JWT extraction error: " + e.getMessage());
             filterChain.doFilter(request, response);
             return;
         }
@@ -56,9 +61,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            System.out.println("Authorities = " + userDetails.getAuthorities());
 
-            if (jwtUtil.isTokenValid(jwt, userDetails.getUsername())) {
+            System.out.println("➡ USER: " + username);
+            System.out.println("➡ AUTHORITIES: " + userDetails.getAuthorities());
+
+            boolean valid = jwtUtil.isTokenValid(jwt, userDetails.getUsername());
+
+            System.out.println("➡ TOKEN VALID: " + valid);
+
+            if (valid) {
 
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(
@@ -77,5 +88,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
-
 }
