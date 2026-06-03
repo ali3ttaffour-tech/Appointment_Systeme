@@ -4,6 +4,7 @@ import com.example.appointment.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -38,13 +39,35 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(auth -> auth
+
+                        // 🔓 public APIs
                         .requestMatchers(
                                 "/api/auth/**",
-                                "/h2-console/**",
                                 "/swagger-ui/**",
-                                "/v3/api-docs/**"
+                                "/v3/api-docs/**",
+                                "/h2-console/**"
                         ).permitAll()
-                        .anyRequest().authenticated()
+
+
+
+                        .requestMatchers("/api/admin/users/**").hasRole("ADMIN")
+
+                        .requestMatchers("/api/services/**").hasAnyRole("ADMIN", "STAFF", "CUSTOMER")
+                        .requestMatchers(HttpMethod.POST, "/api/services/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/services/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/services/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/services/**").hasAnyRole("ADMIN", "STAFF", "CUSTOMER")
+
+
+                        .requestMatchers(HttpMethod.POST, "/api/appointments").hasRole("CUSTOMER")
+
+                        .requestMatchers(HttpMethod.GET, "/api/appointments").hasAnyRole("ADMIN", "STAFF")
+
+                        .requestMatchers(HttpMethod.PATCH, "/api/appointments/**").hasAnyRole("ADMIN", "STAFF")
+
+
+
+
                 )
 
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
