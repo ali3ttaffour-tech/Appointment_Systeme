@@ -65,7 +65,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PATCH, "/api/appointments/**").hasAnyRole("ADMIN", "STAFF")
 
 
-
+                        .anyRequest().authenticated()
 
                 )
 
