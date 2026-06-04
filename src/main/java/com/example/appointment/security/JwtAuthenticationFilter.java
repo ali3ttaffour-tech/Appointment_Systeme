@@ -30,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
-        System.out.println("JWT FILTER WORKING");
+        System.out.println("VERSION-2026-06-04-TEST");
 
         String path = request.getRequestURI();
 
