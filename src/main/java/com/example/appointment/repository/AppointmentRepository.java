@@ -36,4 +36,9 @@ AND a.status != 'CANCELLED'
             LocalDateTime end
     );
 
+
+
+    List<Appointment> findByCustomerUsername(String username);
+
+    long countByStatus(com.example.appointment.enums.AppointmentStatus status);
 }

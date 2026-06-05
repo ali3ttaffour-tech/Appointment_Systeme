@@ -14,7 +14,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
+import org.springframework.security.core.Authentication;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -245,4 +245,67 @@ public class AppointmentService {
         return availableSlots;
     }
 
+
+
+
+
+    public List<Appointment> getMyAppointments() {
+
+        String username = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        return appointmentRepository.findByCustomerUsername(username);
+    }
+
+
+    @Transactional
+    public Appointment cancelAppointment(String appointmentId) {
+
+        String username = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        boolean isAdmin = auth.getAuthorities()
+                .stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        boolean isOwner = appointment.getCustomer()
+                .getUsername()
+                .equals(username);
+
+        if (!isAdmin && !isOwner) {
+            throw new RuntimeException("You are not allowed to cancel this appointment");
+        }
+
+        if (appointment.getStatus() == AppointmentStatus.FINISHED) {
+            throw new RuntimeException("Finished appointment cannot be cancelled");
+        }
+
+        if (appointment.getStatus() == AppointmentStatus.CANCELLED) {
+            throw new RuntimeException("Appointment already cancelled");
+        }
+
+        appointment.setStatus(AppointmentStatus.CANCELLED);
+
+        notificationService.sendToUser(
+                appointment.getCustomer().getUsername(),
+                "Your appointment has been cancelled"
+        );
+
+        emailService.sendMail(
+                appointment.getCustomer().getEmail(),
+                "Appointment Cancelled",
+                "Your appointment has been cancelled"
+        );
+
+        return appointmentRepository.save(appointment);
+    }
 }

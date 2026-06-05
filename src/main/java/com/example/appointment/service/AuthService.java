@@ -88,4 +88,9 @@ public class AuthService {
 
         return new AuthResponse(token);
     }
+
+
+    public String logout() {
+        return "Logged out successfully";
+    }
 }

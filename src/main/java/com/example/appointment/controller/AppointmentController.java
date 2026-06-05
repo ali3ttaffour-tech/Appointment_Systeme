@@ -24,6 +24,30 @@ public class AppointmentController {
 
     private final AppointmentService appointmentService;
 
+
+
+    @Operation(summary = "Get my appointments")
+    @GetMapping("/my")
+    public List<Appointment> getMyAppointments() {
+        return appointmentService.getMyAppointments();
+    }
+
+
+
+    @PatchMapping("/{id}/cancel")
+    public ResponseEntity<?> cancelAppointment(
+            @PathVariable String id
+    ) {
+        try {
+            return ResponseEntity.ok(
+                    appointmentService.cancelAppointment(id)
+            );
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+
     @Operation(summary = "Create appointment")
     @PostMapping
     public Appointment createAppointment(@RequestBody AppointmentRequest req) {

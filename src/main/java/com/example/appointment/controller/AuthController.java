@@ -6,6 +6,7 @@ import com.example.appointment.dto.RegisterRequest;
 import com.example.appointment.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -25,6 +26,7 @@ public class AuthController {
         return authService.login(request);
     }
 
-
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout() {return ResponseEntity.ok(authService.logout());}
 
 }
