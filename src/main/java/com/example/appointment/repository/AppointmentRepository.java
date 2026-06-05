@@ -23,4 +23,17 @@ AND a.status != 'CANCELLED'
     List<Appointment> findByStartTimeBetween(LocalDateTime start, LocalDateTime end);
 
 
+
+    @Query("""
+SELECT a FROM Appointment a
+WHERE a.service.id = :serviceId
+AND a.startTime BETWEEN :start AND :end
+AND a.status != 'CANCELLED'
+""")
+    List<Appointment> findAppointmentsForDay(
+            String serviceId,
+            LocalDateTime start,
+            LocalDateTime end
+    );
+
 }

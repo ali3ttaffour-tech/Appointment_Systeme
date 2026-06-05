@@ -1,5 +1,6 @@
 package com.example.appointment.service;
 
+import com.example.appointment.dto.AvailableSlotResponse;
 import com.example.appointment.entity.Appointment;
 import com.example.appointment.entity.ServiceEntity;
 import com.example.appointment.entity.User;
@@ -14,8 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -179,5 +182,67 @@ public class AppointmentService {
         return appointmentRepository.findAll();
     }
 
+
+
+
+
+    public List<AvailableSlotResponse> getAvailableSlots(
+            String serviceId,
+            LocalDate date
+    ) {
+
+        ServiceEntity service = serviceRepository.findById(serviceId)
+                .orElseThrow(() -> new RuntimeException("Service not found"));
+
+        int duration = service.getDurationMinutes();
+
+        WorkingSchedule schedule = workingScheduleRepository
+                .findByDayOfWeek(date.getDayOfWeek().getValue())
+                .orElseThrow(() -> new RuntimeException("No working schedule"));
+
+        if (schedule.isHoliday()) {
+            return List.of();
+        }
+
+        LocalDateTime dayStart = LocalDateTime.of(date, schedule.getStartTime());
+        LocalDateTime dayEnd = LocalDateTime.of(date, schedule.getEndTime());
+
+        List<Appointment> bookedAppointments =
+                appointmentRepository.findAppointmentsForDay(
+                        serviceId,
+                        dayStart,
+                        dayEnd
+                );
+
+        List<AvailableSlotResponse> availableSlots = new ArrayList<>();
+
+        LocalDateTime slotStart = dayStart;
+
+        while (!slotStart.plusMinutes(duration).isAfter(dayEnd)) {
+
+            LocalDateTime currentSlotStart = slotStart;
+            LocalDateTime slotEnd = currentSlotStart.plusMinutes(duration);
+
+            boolean conflict = bookedAppointments.stream()
+                    .anyMatch(a ->
+                            a.getStartTime().isBefore(slotEnd)
+                                    &&
+                                    a.getEndTime().isAfter(currentSlotStart)
+                    );
+
+            if (!conflict) {
+                availableSlots.add(
+                        new AvailableSlotResponse(
+                                currentSlotStart,
+                                slotEnd
+                        )
+                );
+            }
+
+            slotStart = slotStart.plusMinutes(duration);
+        }
+
+        return availableSlots;
+    }
 
 }
