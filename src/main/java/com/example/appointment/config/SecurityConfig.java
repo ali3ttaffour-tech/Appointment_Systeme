@@ -64,7 +64,7 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.GET, "/api/appointments").hasAnyRole("ADMIN", "STAFF")
 
-                        .requestMatchers(HttpMethod.PATCH, "/api/appointments/**").hasAnyRole("ADMIN", "STAFF")
+                        .requestMatchers(HttpMethod.PATCH, "/api/appointments/*/status").hasAnyRole("ADMIN", "STAFF")
 
 
                         .requestMatchers(HttpMethod.PATCH, "/api/appointments/*/cancel").hasAnyRole("CUSTOMER","ADMIN")
