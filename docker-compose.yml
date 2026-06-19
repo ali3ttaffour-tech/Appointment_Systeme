@@ -3,7 +3,7 @@ version: '3.8'
 services:
 
   app:
-    build: .
+    image: alihassan128/appointment-system:latest
     container_name: spring-app
 
     dns:
@@ -25,7 +25,20 @@ services:
       - network-appointment
 
     restart: always
+  apache:
+    build: ./apache
+    container_name: appointment-apache
 
+    depends_on:
+      - app
+
+    ports:
+      - "8088:80"
+
+    networks:
+      - network-appointment
+
+    restart: always
 
   mysql:
     image: mysql:8.0

@@ -24,3 +24,7 @@ Thumbs.db
 # Spring Boot
 *.pid
 *.out
+
+portainer-data/
+mysql_data/
+
