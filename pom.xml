@@ -15,6 +15,10 @@
 	<description>Smart Appointment Scheduling System</description>
 	<properties>
 		<java.version>17</java.version>
+                <logback.version>1.4.12</logback.version>
+                <mysql.version>8.2.0</mysql.version>
+              
+
 	</properties>
 	<dependencies>
 		<dependency>
