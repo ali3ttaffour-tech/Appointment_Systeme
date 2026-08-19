@@ -1,0 +1,38 @@
+Model: LogisticRegression  (version 1.0.0)
+Test accuracy: 0.9979
+Test macro F1: 0.9979
+
+Classification report:
+                      precision    recall  f1-score   support
+
+   APPLICATION_ERROR       0.97      1.00      0.99        39
+AUTHENTICATION_ERROR       1.00      1.00      1.00        39
+ AUTHORIZATION_ERROR       1.00      1.00      1.00        39
+      DATABASE_ERROR       1.00      1.00      1.00        39
+                INFO       1.00      0.97      0.99        39
+       NETWORK_ERROR       1.00      1.00      1.00        39
+ PERFORMANCE_WARNING       1.00      1.00      1.00        39
+      SECURITY_ALERT       1.00      1.00      1.00        39
+        SYSTEM_ERROR       1.00      1.00      1.00        39
+             UNKNOWN       1.00      1.00      1.00        39
+    VALIDATION_ERROR       1.00      1.00      1.00        39
+             WARNING       1.00      1.00      1.00        39
+
+            accuracy                           1.00       468
+           macro avg       1.00      1.00      1.00       468
+        weighted avg       1.00      1.00      1.00       468
+
+Confusion matrix (rows=actual, cols=predicted):
+labels: APPLICATION_ERROR, AUTHENTICATION_ERROR, AUTHORIZATION_ERROR, DATABASE_ERROR, INFO, NETWORK_ERROR, PERFORMANCE_WARNING, SECURITY_ALERT, SYSTEM_ERROR, UNKNOWN, VALIDATION_ERROR, WARNING
+[39, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[0, 39, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[0, 0, 39, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[0, 0, 0, 39, 0, 0, 0, 0, 0, 0, 0, 0]
+[1, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 0]
+[0, 0, 0, 0, 0, 39, 0, 0, 0, 0, 0, 0]
+[0, 0, 0, 0, 0, 0, 39, 0, 0, 0, 0, 0]
+[0, 0, 0, 0, 0, 0, 0, 39, 0, 0, 0, 0]
+[0, 0, 0, 0, 0, 0, 0, 0, 39, 0, 0, 0]
+[0, 0, 0, 0, 0, 0, 0, 0, 0, 39, 0, 0]
+[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 39, 0]
+[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 39]

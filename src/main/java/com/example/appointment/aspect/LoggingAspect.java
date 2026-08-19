@@ -1,25 +1,38 @@
 package com.example.appointment.aspect;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 @Aspect
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class LoggingAspect {
+
+    private final AiLogForwarder aiLogForwarder;
 
     // قبل تنفيذ أي method داخل controller
     @Before("execution(* com.example.appointment.controller.*.*(..))")
     public void logBefore(JoinPoint joinPoint) {
 
-        log.info(
-                "Method: {} | Arguments: {}",
+        String args = Arrays.stream(joinPoint.getArgs())
+                .map(LogSanitizer::sanitize)
+                .collect(Collectors.joining(", "));
+
+        String message = String.format(
+                "Method: %s | Arguments: %s",
                 joinPoint.getSignature().getName(),
-                joinPoint.getArgs()
+                args
         );
 
+        log.info(message);
+        aiLogForwarder.submit(message);
     }
 
     // بعد نجاح التنفيذ
@@ -29,10 +42,15 @@ public class LoggingAspect {
     )
     public void logAfterReturning(JoinPoint joinPoint, Object result) {
 
-        log.info("Method Completed: {} | Result: {}",
+        String sanitizedResult = LogSanitizer.sanitize(result);
+        String message = String.format(
+                "Method Completed: %s | Result: %s",
                 joinPoint.getSignature().getName(),
-                result);
+                sanitizedResult
+        );
 
+        log.info(message);
+        aiLogForwarder.submit(message);
     }
 
     // عند حدوث خطأ
@@ -42,9 +60,13 @@ public class LoggingAspect {
     )
     public void logAfterThrowing(JoinPoint joinPoint, Exception ex) {
 
-        log.error("Exception in method: {} | Message: {}",
+        String message = String.format(
+                "Exception in method: %s | Message: %s",
                 joinPoint.getSignature().getName(),
-                ex.getMessage());
+                LogSanitizer.sanitize(ex.getMessage())
+        );
 
+        log.error(message);
+        aiLogForwarder.submit(message);
     }
 }

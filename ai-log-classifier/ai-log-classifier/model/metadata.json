@@ -1,0 +1,59 @@
+{
+  "model_version": "1.0.0",
+  "algorithm": "LogisticRegression",
+  "training_date": "2026-08-18T10:38:10.020495+00:00",
+  "dataset_version": "synthetic-1.0",
+  "dataset_size": 3120,
+  "categories": [
+    "APPLICATION_ERROR",
+    "AUTHENTICATION_ERROR",
+    "AUTHORIZATION_ERROR",
+    "DATABASE_ERROR",
+    "INFO",
+    "NETWORK_ERROR",
+    "PERFORMANCE_WARNING",
+    "SECURITY_ALERT",
+    "SYSTEM_ERROR",
+    "UNKNOWN",
+    "VALIDATION_ERROR",
+    "WARNING"
+  ],
+  "accuracy": 0.9979,
+  "f1_score_macro": 0.9979,
+  "precision_macro": 0.9979,
+  "recall_macro": 0.9979,
+  "validation_comparison": {
+    "LogisticRegression": {
+      "accuracy": 1.0,
+      "precision_macro": 1.0,
+      "recall_macro": 1.0,
+      "f1_macro": 1.0,
+      "f1_critical_categories": 1.0,
+      "fit_time_seconds": 0.068
+    },
+    "MultinomialNB": {
+      "accuracy": 0.9957,
+      "precision_macro": 0.9959,
+      "recall_macro": 0.9957,
+      "f1_macro": 0.9957,
+      "f1_critical_categories": 1.0,
+      "fit_time_seconds": 0.004
+    },
+    "LinearSVC (calibrated)": {
+      "accuracy": 1.0,
+      "precision_macro": 1.0,
+      "recall_macro": 1.0,
+      "f1_macro": 1.0,
+      "f1_critical_categories": 1.0,
+      "fit_time_seconds": 0.341
+    },
+    "RandomForest": {
+      "accuracy": 1.0,
+      "precision_macro": 1.0,
+      "recall_macro": 1.0,
+      "f1_macro": 1.0,
+      "f1_critical_categories": 1.0,
+      "fit_time_seconds": 0.504
+    }
+  }
+}
