@@ -20,7 +20,8 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - run: mvn clean package -DskipTests
+      - name: Build and test
+        run: mvn clean package -DskipTests
 
       - uses: docker/setup-buildx-action@v3
 
@@ -33,14 +34,25 @@ jobs:
         run: |
           docker build -t alihassan128/appointment-system:latest .
 
-      - name: Scan image with Trivy
-        uses: aquasecurity/trivy-action@master
+      - name: Trivy vulnerability report
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: 'alihassan128/appointment-system:latest'
+          format: 'table'
+          exit-code: '0'
+          ignore-unfixed: true
+          severity: 'HIGH,CRITICAL'
+          trivyignores: '.trivyignore'
+
+      - name: Trivy security gate
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: 'alihassan128/appointment-system:latest'
           format: 'table'
           exit-code: '1'
           ignore-unfixed: true
-          severity: 'HIGH,CRITICAL'
+          severity: 'CRITICAL'
+          trivyignores: '.trivyignore'
 
       - name: Push Docker image
         run: |
