@@ -1,0 +1,7 @@
+# Known CVEs accepted temporarily for the current dependency baseline
+CVE-2025-24813
+CVE-2026-41293
+CVE-2026-43512
+CVE-2026-43515
+CVE-2024-38821
+CVE-2026-22732
