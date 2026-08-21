@@ -71,4 +71,5 @@ jobs:
         run: |
           cd /home/dell/Appointment_Systeme
           docker compose pull
-          docker compose up -d
+          docker compose up -d --force-recreate
+
