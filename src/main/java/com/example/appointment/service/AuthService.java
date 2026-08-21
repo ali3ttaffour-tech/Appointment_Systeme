@@ -86,7 +86,13 @@ public class AuthService {
 
 
 
-        return new AuthResponse(token);
+        return new AuthResponse(
+        token,
+        user.getId(),
+        user.getUsername(),
+        user.getEmail(),
+        user.getRole().name()
+);
     }
 
 

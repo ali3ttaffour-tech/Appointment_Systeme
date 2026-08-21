@@ -2,6 +2,9 @@ version: '3.8'
 
 services:
 
+  # ==========================================================
+  # SPRING BOOT BACKEND
+  # ==========================================================
   app:
     image: alihassan128/appointment-system:latest
     container_name: spring-app
@@ -34,11 +37,27 @@ services:
 
 
   # ==========================================================
+  # FRONTEND
+  # ==========================================================
+  frontend:
+    image: alihassan128/maw3idi-frontend:latest
+    container_name: maw3idi-frontend
+
+    depends_on:
+      - app
+
+    networks:
+      - network-appointment
+
+    restart: always
+
+
+  # ==========================================================
   # AI LOG CLASSIFIER
   # ==========================================================
   ai-log-classifier:
     build:
-      context: ./ai-log-classifier/ai-log-classifier
+      context: ./ai-log-classifier
 
     container_name: ai-log-classifier
 
@@ -47,22 +66,17 @@ services:
 
     restart: unless-stopped
 
-    # لا نحتاج ports هنا.
-    # Spring يصل للخدمة داخلياً عبر:
-    # http://ai-log-classifier:8000
-    #
-    # وإذا أردت لاحقاً اختبارها من Ubuntu مباشرة،
-    # يمكننا إضافة:
-    # ports:
-    #   - "8000:8000"
 
-
+  # ==========================================================
+  # APACHE REVERSE PROXY
+  # ==========================================================
   apache:
     build: ./apache
     container_name: appointment-apache
 
     depends_on:
       - app
+      - frontend
 
     ports:
       - "8088:80"
@@ -73,6 +87,34 @@ services:
     restart: always
 
 
+  # ==========================================================
+  # VAULT
+  # ==========================================================
+  vault:
+    image: hashicorp/vault:1.20
+    container_name: vault
+
+    cap_add:
+      - IPC_LOCK
+
+    ports:
+      - "8200:8200"
+
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: root-token
+      VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
+
+    command: vault server -dev
+
+    networks:
+      - network-appointment
+
+    restart: always
+
+
+  # ==========================================================
+  # MYSQL
+  # ==========================================================
   mysql:
     image: mysql:8.0
     container_name: mysql-db
@@ -93,6 +135,9 @@ services:
       - network-appointment
 
 
+  # ==========================================================
+  # PHPMYADMIN
+  # ==========================================================
   phpmyadmin:
     image: phpmyadmin
     container_name: phpmyadmin
@@ -110,6 +155,9 @@ services:
       - network-appointment
 
 
+  # ==========================================================
+  # PORTAINER
+  # ==========================================================
   portainer:
     image: portainer/portainer-ce:latest
     container_name: portainer
@@ -128,6 +176,9 @@ services:
       - network-appointment
 
 
+  # ==========================================================
+  # CADVISOR
+  # ==========================================================
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
     container_name: cadvisor
@@ -150,6 +201,9 @@ services:
       - network-appointment
 
 
+  # ==========================================================
+  # PROMETHEUS
+  # ==========================================================
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
@@ -175,6 +229,9 @@ services:
       - network-appointment
 
 
+  # ==========================================================
+  # GRAFANA
+  # ==========================================================
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
@@ -194,12 +251,18 @@ services:
       - network-appointment
 
 
+# ============================================================
+# VOLUMES
+# ============================================================
 volumes:
   mysql_data:
   prometheus_data:
   grafana_data:
 
 
+# ============================================================
+# NETWORK
+# ============================================================
 networks:
   network-appointment:
     driver: bridge
