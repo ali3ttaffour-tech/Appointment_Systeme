@@ -39,6 +39,27 @@ INFERENCE_TIME = Histogram(
     "inference_time_seconds", "Time to classify a single log", registry=registry
 )
 
+
+# Initialize all known categories so Prometheus exposes them
+# even when no logs have been classified yet.
+KNOWN_CATEGORIES = (
+    "INFO",
+    "WARNING",
+    "APPLICATION_ERROR",
+    "DATABASE_ERROR",
+    "AUTHENTICATION_ERROR",
+    "AUTHORIZATION_ERROR",
+    "VALIDATION_ERROR",
+    "NETWORK_ERROR",
+    "PERFORMANCE_WARNING",
+    "SECURITY_ALERT",
+    "SYSTEM_ERROR",
+    "UNKNOWN",
+)
+
+for category in KNOWN_CATEGORIES:
+    CLASSIFICATION_COUNT_BY_CATEGORY.labels(category=category)
+
 _RECENT_MAX = 200
 _recent_lock = threading.Lock()
 _recent = deque(maxlen=_RECENT_MAX)
