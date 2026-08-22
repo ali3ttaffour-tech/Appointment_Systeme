@@ -1,21 +1,17 @@
 package com.example.appointment.controller;
 
 import com.example.appointment.dto.AppointmentRequest;
+import com.example.appointment.dto.AppointmentResponse;
 import com.example.appointment.dto.AvailableSlotResponse;
-import com.example.appointment.entity.Appointment;
 import com.example.appointment.enums.AppointmentStatus;
 import com.example.appointment.service.AppointmentService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
-
-
 
 @RestController
 @RequestMapping("/api/appointments")
@@ -24,15 +20,11 @@ public class AppointmentController {
 
     private final AppointmentService appointmentService;
 
-
-
     @Operation(summary = "Get my appointments")
     @GetMapping("/my")
-    public List<Appointment> getMyAppointments() {
+    public List<AppointmentResponse> getMyAppointments() {
         return appointmentService.getMyAppointments();
     }
-
-
 
     @PatchMapping("/{id}/cancel")
     public ResponseEntity<?> cancelAppointment(
@@ -47,16 +39,20 @@ public class AppointmentController {
         }
     }
 
-
     @Operation(summary = "Create appointment")
     @PostMapping
-    public Appointment createAppointment(@RequestBody AppointmentRequest req) {
-        return appointmentService.createAppointment(req.getServiceId(), req.getStartTime());
+    public AppointmentResponse createAppointment(
+            @RequestBody AppointmentRequest req
+    ) {
+        return appointmentService.createAppointment(
+                req.getServiceId(),
+                req.getStartTime()
+        );
     }
 
     @Operation(summary = "Get all appointments")
     @GetMapping
-    public List<Appointment> getAllAppointments() {
+    public List<AppointmentResponse> getAllAppointments() {
         return appointmentService.getAllAppointments();
     }
 
@@ -74,9 +70,6 @@ public class AppointmentController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
-
-
 
     @RestController
     @RequestMapping("/api/services")

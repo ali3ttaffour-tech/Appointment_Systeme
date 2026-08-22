@@ -1,5 +1,6 @@
 package com.example.appointment.service;
 
+import com.example.appointment.dto.AppointmentResponse;
 import com.example.appointment.dto.AvailableSlotResponse;
 import com.example.appointment.entity.Appointment;
 import com.example.appointment.entity.ServiceEntity;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AppointmentService {
@@ -27,11 +29,8 @@ public class AppointmentService {
     @Autowired
     private NotificationService notificationService;
 
-
-
     @Autowired
     private EmailService emailService;
-
 
     @Autowired
     private UserRepository userRepository;
@@ -44,6 +43,19 @@ public class AppointmentService {
 
     @Autowired
     private WorkingScheduleRepository workingScheduleRepository;
+
+    private AppointmentResponse toResponse(Appointment appointment) {
+        return new AppointmentResponse(
+                appointment.getId(),
+                appointment.getCustomer().getId(),
+                appointment.getCustomer().getUsername(),
+                appointment.getService().getId(),
+                appointment.getService().getName(),
+                appointment.getStartTime(),
+                appointment.getEndTime(),
+                appointment.getStatus()
+        );
+    }
 
     private boolean isValidSlot(LocalDateTime startTime, LocalTime workStart, LocalTime workEnd, int duration) {
 
@@ -73,17 +85,12 @@ public class AppointmentService {
     }
 
 
-
-
-
-
-
-
-
-
+        public void deleteAppointment(String id) {
+        appointmentRepository.deleteById(id);
+        }
 
     @Transactional
-    public Appointment createAppointment(String serviceId, LocalDateTime startTime) {
+    public AppointmentResponse createAppointment(String serviceId, LocalDateTime startTime) {
 
         // 1) جلب الاسم من التوكن
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -107,7 +114,8 @@ public class AppointmentService {
             throw new RuntimeException("Holiday");
         }
 
-        // ————————————————————————
+
+// ————————————————————————
         // 🟢 4) التحقق من أن الفتحة الزمنية صحيحة
         boolean validSlot = isValidSlot(
                 startTime,
@@ -138,11 +146,6 @@ public class AppointmentService {
         appointment.setEndTime(endTime);
         appointment.setStatus(AppointmentStatus.PENDING);
 
-
-
-
-
-
         emailService.sendMail(
                 user.getEmail(),
                 "Appointment Confirmed",
@@ -150,19 +153,11 @@ public class AppointmentService {
                         " has been booked at " + startTime
         );
 
-        return appointmentRepository.save(appointment);
+        Appointment saved = appointmentRepository.save(appointment);
+        return toResponse(saved);
     }
 
-
-
-
-
-
-
-
-
-
-    public Appointment updateStatus(String id, AppointmentStatus status) {
+    public AppointmentResponse updateStatus(String id, AppointmentStatus status) {
 
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
@@ -173,18 +168,16 @@ public class AppointmentService {
                 appointment.getCustomer().getUsername(),
                 "Your appointment status changed to " + status
         );
-        return appointmentRepository.save(appointment);
+        Appointment saved = appointmentRepository.save(appointment);
+        return toResponse(saved);
     }
 
-
-
-    public List<Appointment> getAllAppointments() {
-        return appointmentRepository.findAll();
+    public List<AppointmentResponse> getAllAppointments() {
+        return appointmentRepository.findAll()
+                .stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
     }
-
-
-
-
 
     public List<AvailableSlotResponse> getAvailableSlots(
             String serviceId,
@@ -239,29 +232,27 @@ public class AppointmentService {
                 );
             }
 
-            slotStart = slotStart.plusMinutes(duration);
+slotStart = slotStart.plusMinutes(duration);
         }
 
         return availableSlots;
     }
 
-
-
-
-
-    public List<Appointment> getMyAppointments() {
+    public List<AppointmentResponse> getMyAppointments() {
 
         String username = SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getName();
 
-        return appointmentRepository.findByCustomerUsername(username);
+        return appointmentRepository.findByCustomerUsername(username)
+                .stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
     }
 
-
     @Transactional
-    public Appointment cancelAppointment(String appointmentId) {
+    public AppointmentResponse cancelAppointment(String appointmentId) {
 
         String username = SecurityContextHolder
                 .getContext()
@@ -306,6 +297,7 @@ public class AppointmentService {
                 "Your appointment has been cancelled"
         );
 
-        return appointmentRepository.save(appointment);
+        Appointment saved = appointmentRepository.save(appointment);
+        return toResponse(saved);
     }
 }
